@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  node1:
+    build: .
+    container_name: node1
+    hostname: node1
+    environment:
+      - NODE_ID=1
+      - TOTAL_NODES=5
+    networks:
+      - distributed
+
+  node2:
+    build: .
+    container_name: node2
+    hostname: node2
+    environment:
+      - NODE_ID=2
+      - TOTAL_NODES=5
+    networks:
+      - distributed
+
+  node3:
+    build: .
+    container_name: node3
+    hostname: node3
+    environment:
+      - NODE_ID=3
+      - TOTAL_NODES=5
+    networks:
+      - distributed
+
+  node4:
+    build: .
+    container_name: node4
+    hostname: node4
+    environment:
+      - NODE_ID=4
+      - TOTAL_NODES=5
+    networks:
+      - distributed
+
+  node5:
+    build: .
+    container_name: node5
+    hostname: node5
+    environment:
+      - NODE_ID=5
+      - TOTAL_NODES=5
+    networks:
+      - distributed
+
+networks:
+  distributed:
+    driver: bridge

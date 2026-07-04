@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Testes - Sistemas Distribuídos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.7);
+            --surface-hover: rgba(30, 41, 59, 0.9);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            
+            --pass-color: #10b981;
+            --pass-bg: rgba(16, 185, 129, 0.15);
+            
+            --skip-color: #f59e0b;
+            --skip-bg: rgba(245, 158, 11, 0.15);
+            
+            --accent-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .title-gradient {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Stats Summary */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .stat-card {
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .val-pass { color: var(--pass-color); }
+        .val-skip { color: var(--skip-color); }
+        .val-total { color: #3b82f6; }
+
+        /* Test Suites */
+        .suite-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .suite-card {
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .suite-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .suite-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .suite-time {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Test Items */
+        .test-list {
+            list-style: none;
+        }
+
+        .test-item {
+            padding: 18px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            transition: background 0.2s;
+            gap: 15px;
+        }
+        
+        .test-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .test-info {
+            flex: 1;
+        }
+
+        .test-name {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
+
+        .test-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .test-result-text {
+            font-size: 0.85rem;
+            margin-top: 6px;
+            font-weight: 600;
+        }
+        
+        .res-pass { color: var(--pass-color); }
+        .res-skip { color: var(--skip-color); }
+
+        .badge {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .badge.pass {
+            background: var(--pass-bg);
+            color: var(--pass-color);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge.skip {
+            background: var(--skip-bg);
+            color: var(--skip-color);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1 class="title-gradient">Relatório de Testes</h1>
+            <p>Laboratório 2 - Sistemas Distribuídos (Lamport, Ricart-Agrawala, Bully)</p>
+        </header>
+
+        <section class="summary-cards">
+            <div class="stat-card">
+                <div class="stat-value val-total">12</div>
+                <div class="stat-label">Total de Testes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value val-pass">11</div>
+                <div class="stat-label">Sucesso (PASS)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value val-skip">1</div>
+                <div class="stat-label">Ignorados (SKIP)</div>
+            </div>
+        </section>
+
+        <section class="suite-container">
+            
+            <!-- Clock Suite -->
+            <div class="suite-card">
+                <div class="suite-header">
+                    <div class="suite-title">
+                        ⏱️ Relógio de Lamport 
+                        <span class="badge pass">PASS</span>
+                    </div>
+                    <div class="suite-time">lab2/internal/clock (0.008s)</div>
+                </div>
+                <ul class="test-list">
+                    <li class="test-item">
+                        <div class="test-info">
+                            <div class="test-name">TestLamportClock_Tick</div>
+                            <div class="test-desc">Verificou se um evento local comum avança o relógio logicamente em +1 de forma correta.</div>
+                            <div class="test-result-text res-pass">Resultado: Relógio avançou estritamente.</div>
+                        </div>
+                        <span class="badge pass">PASS</span>
+                    </li>
+                    <li class="test-item">
+                        <div class="test-info">
+                            <div class="test-name">TestLamportClock_SendTick</div>
+                            <div class="test-desc">Verificou se, antes de enviar uma mensagem na rede, o nó incrementa o próprio relógio em +1 e o anexa à mensagem.</div>
+                            <div class="test-result-text res-pass">Resultado: Incremento e anexação corretos.</div>
+                        </div>
+                        <span class="badge pass">PASS</span>
+                    </li>
+                    <li class="test-item">
+                        <div class="test-info">
+                            <div class="test-name">TestLamportClock_ReceiveTick</div>
+                            <div class="test-desc">Validou a regra de recepção do Algoritmo de Lamport: <code>max(relogio_local, relogio_recebido) + 1</code>. Testado tanto para tempos recebidos maiores quanto menores que o tempo atual.</div>
+                            <div class="test-result-text res-pass">Resultado: O relógio obedeceu à lei de causalidade em ambos os cenários.</div>
+                        </div>
+                        <span class="badge pass">PASS</span>
+                    </li>
+                    <li class="test-item">
+                        <div class="test-info">
+                            <div class="test-name">TestLamportClock_Concurrent</div>
+                            <div class="test-desc">Teste de estresse disparando centenas de Goroutines simultâneas acessando o relógio. O objetivo era provar que o Mutex interno impede corrompimento dos dados (Race Conditions).</div>
+                            <div class="test-result-text res-pass">Resultado: O relógio manteve os incrementos consistentes sem falhas.</div>
+                        </div>
+                        <span class="badge pass">PASS</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Election Suite -->
+            <div class="suite-card">
+                <div class="suite-header">
+                    <div class="suite-title">
+                        👑 Eleição Bully 
+                        <span class="badge pass">PASS</span>
+                    </div>
+                    <div class="suite-time">lab2/internal/election (0.110s)</div>
+                </div>
+                <ul class="test-list">
+                    <li class="test-item">
+                        <div class="test-info">
+                            <div class="test-name">TestBullyElection_StartElection_SendToHigher</div>
+                            <div class="test-desc">Validou se um nó (ex: ID 3) ao detectar falha do líder inicia a eleição enviando a mensagem <code>ELECTION</code> exclusivamente para nós de ID superior (4 e 5).</div>
+                            <div class="test-result-text res-pass">Resultado: Apenas 2 mensagens <code>ELECTION</code> foram disparadas e roteadas perfeitamente.</div>
+                        </div>
+                        <span class="badge pass">PASS</span>
+                    </li>
+                    <li class="test-item">
+                        <div class="test-info">
+                            <div class="test-name">TestBullyElection_HandleElection_SendOK</div>
+                            <div class="test-desc">Simulou o recebimento de uma mensagem <code>ELECTION</code> vinda de um nó inferior. Verificou se o nó atual manda a resposta <code>OK</code> para interromper o processo inferior e puxa a responsabilidade para si.</div>
+                            <div class="test-result-text res-pass">Resultado: Respondeu <code>OK</code> impedindo o nó menor de vencer, e deu início à sua própria eleição.</div>
+                        </div>
+                        <span class="badge pass">PASS</span>
+                    </li>
+                    <li class="test-item">
+                        <div class="test-info">
+                            <div class="test-name">TestBullyElection_HandleCoordinator</div>
+                            <div class="test-desc">Garantiu que, após um nó maior vencer e enviar o broadcast de <code>COORDINATOR</code>, os demais nós atualizem seu estado interno assumindo a soberania do novo ID.</div>
+                            <div class="test-result-text res-pass">Resultado: O nó internalizou perfeitamente a mudança de líder.</div>
+                        </div>
+                        <span class="badge pass">PASS</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Mutex Suite -->
+            <div class="suite-card">
+                <div class="suite-header">
+                    <div class="suite-title">
+                        🔒 Exclusão Mútua (Ricart-Agrawala)
+                        <span class="badge pass">PASS</span>
+                    </div>
+                    <div class="suite-time">lab2/internal/mutex (0.132s)</div>
+                </div>
+                <ul class="test-list">
+                    <li class="test-item">
+                        <div class="test-info">
+                            <div class="test-name">TestRicartAgrawala_HandleRequest_Released</div>
+                            <div class="test-desc">Verificou se o nó concede permissão (enviando <code>REPLY</code>) de forma imediata quando recebe um <code>REQUEST</code> e não possui interesse (estado Released) em entrar na Seção Crítica.</div>
+                            <div class="test-result-text res-pass">Resultado: Respondeu com <code>REPLY</code> imediatamente.</div>
+                        </div>
+                        <span class="badge pass">PASS</span>
+                    </li>
+                    <li class="test-item">
+                        <div class="test-info">
+                            <div class="test-name">TestRicartAgrawala_HandleRequest_Held</div>
+                            <div class="test-desc">Confirmou que o nó "prende" e enfileira uma requisição recebida (ignorando o envio de <code>REPLY</code> temporariamente) se ele já estiver dentro da sua própria Seção Crítica (estado Held).</div>
+                            <div class="test-result-text res-pass">Resultado: O nó requisitante foi perfeitamente enfileirado e o <code>REPLY</code> contido.</div>
+                        </div>
+                        <span class="badge pass">PASS</span>
+                    </li>
+                    <li class="test-item">
+                        <div class="test-info">
+                            <div class="test-name">TestRicartAgrawala_HandleRequest_WantedPriority</div>
+                            <div class="test-desc">Assegurou a regra de conflito: se dois nós querem a Seção Crítica (estado Wanted), o nó atual não deve dar permissão caso o relógio lógico dele mostre que ele pediu o recurso primeiro.</div>
+                            <div class="test-result-text res-pass">Resultado: Avaliação de timestamp lógico foi correta, mantendo a prioridade para quem solicitou antes.</div>
+                        </div>
+                        <span class="badge pass">PASS</span>
+                    </li>
+                    <li class="test-item">
+                        <div class="test-info">
+                            <div class="test-name">TestRicartAgrawala_HandleRequest_WantedConcede</div>
+                            <div class="test-desc">Cenário inverso da prioridade: se ambos querem o recurso, mas o nó rival fez a requisição com um Timestamp mais antigo, o nó atual deve conceder a permissão (<code>REPLY</code>) e aguardar a sua vez.</div>
+                            <div class="test-result-text res-pass">Resultado: Permissão concedida educadamente, respeitando a ordem causal.</div>
+                        </div>
+                        <span class="badge pass">PASS</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- E2E Suite -->
+            <div class="suite-card">
+                <div class="suite-header">
+                    <div class="suite-title">
+                        🐳 Testes End-to-End (Integração)
+                        <span class="badge pass">PASS</span>
+                    </div>
+                    <div class="suite-time">lab2/tests (0.005s)</div>
+                </div>
+                <ul class="test-list">
+                    <li class="test-item">
+                        <div class="test-info">
+                            <div class="test-name">TestE2E_DockerCompose</div>
+                            <div class="test-desc">Teste pesado que simula a execução real: orquestra os 5 nós distribuídos no `docker-compose`, lê o fluxo real da rede, analisa os logs em busca de sobreposição proibida de "SEÇÃO CRÍTICA" e checa o avanço dos Relógios Lógicos na prática, garantindo que o Bully inicial elegeu o nó 5.</div>
+                            <div class="test-result-text res-skip">Resultado: Como rodamos os testes encapsulados dentro de um contêiner Go puro por segurança, ele pulou este teste (SKIP) elegantemente pois identificou a falta do pacote docker-compose no terminal virtual, evitando uma falha errônea (exit status 1).</div>
+                        </div>
+                        <span class="badge skip">SKIP</span>
+                    </li>
+                </ul>
+            </div>
+
+        </section>
+    </div>
+
+</body>
+</html>

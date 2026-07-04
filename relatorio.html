@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 2 - Algoritmos Distribuídos | MC714 UNICAMP</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #1c2333;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --accent2: #3fb950;
+            --accent3: #d2a8ff;
+            --accent4: #f0883e;
+            --accent5: #f778ba;
+            --danger: #f85149;
+            --code-bg: #0d1117;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* ---- HEADER ---- */
+        .hero {
+            background: linear-gradient(135deg, #0d1117 0%, #1a1f3a 50%, #0d1117 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 60px 0 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(88,166,255,0.08) 0%, transparent 70%);
+        }
+        .hero h1 {
+            font-size: 2.6em;
+            font-weight: 700;
+            color: var(--text);
+            position: relative;
+        }
+        .hero h1 span { color: var(--accent); }
+        .hero .subtitle {
+            font-size: 1.15em;
+            color: var(--text-muted);
+            margin-top: 10px;
+            position: relative;
+        }
+        .hero .badges {
+            margin-top: 22px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.82em;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+        .badge.go { color: #00ADD8; border-color: #00ADD844; }
+        .badge.docker { color: #2496ED; border-color: #2496ED44; }
+        .badge.tcp { color: var(--accent2); border-color: #3fb95044; }
+        .badge.nodes { color: var(--accent4); border-color: #f0883e44; }
+
+        /* ---- LAYOUT ---- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ---- NAV ---- */
+        .nav-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-bar .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+        }
+        .nav-bar a {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 12px 18px;
+            font-size: 0.88em;
+            font-weight: 500;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .nav-bar a:hover {
+            color: var(--text);
+            border-bottom-color: var(--accent);
+        }
+
+        /* ---- SECTIONS ---- */
+        section {
+            padding: 50px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        section:last-child { border-bottom: none; }
+
+        h2 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        h2 .num {
+            color: var(--accent);
+            font-weight: 400;
+            margin-right: 6px;
+        }
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 1.05em;
+            margin-bottom: 32px;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            font-weight: 600;
+            margin: 30px 0 14px;
+            color: var(--accent3);
+        }
+
+        h4 {
+            font-size: 1.05em;
+            font-weight: 600;
+            margin: 20px 0 10px;
+            color: var(--text);
+        }
+
+        p { margin-bottom: 14px; }
+
+        /* ---- CARDS ---- */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px;
+            margin: 20px 0;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 24px;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: var(--accent); }
+        .card .icon {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+        .card h4 {
+            margin: 0 0 8px;
+            font-size: 1.1em;
+            color: var(--text);
+        }
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.92em;
+            margin: 0;
+        }
+        .card .tag {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+        .tag-lamport { background: #58a6ff22; color: var(--accent); }
+        .tag-mutex { background: #3fb95022; color: var(--accent2); }
+        .tag-bully { background: #f0883e22; color: var(--accent4); }
+
+        /* ---- CODE ---- */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 18px 20px;
+            overflow-x: auto;
+            font-size: 0.88em;
+            line-height: 1.6;
+            margin: 14px 0 20px;
+        }
+        code {
+            font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+        }
+        :not(pre) > code {
+            background: var(--surface2);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent3);
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            padding: 8px 16px;
+            font-size: 0.82em;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 14px;
+        }
+        .code-header + pre {
+            margin-top: 0;
+            border-radius: 0 0 8px 8px;
+        }
+        .code-header .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot-go { background: #00ADD8; }
+        .dot-yaml { background: #cb171e; }
+        .dot-docker { background: #2496ED; }
+        .dot-json { background: #f0883e; }
+
+        /* syntax colors */
+        .kw { color: #ff7b72; }
+        .fn { color: #d2a8ff; }
+        .st { color: #a5d6ff; }
+        .cm { color: #8b949e; font-style: italic; }
+        .tp { color: #79c0ff; }
+        .num { color: #79c0ff; }
+        .op { color: #ff7b72; }
+
+        /* ---- DIAGRAM ---- */
+        .diagram-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 28px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        .diagram-box pre {
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.85em;
+            color: var(--accent);
+        }
+        .diagram-box .title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 14px;
+            font-size: 0.95em;
+        }
+
+        /* ---- TABLE ---- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 24px;
+            font-size: 0.92em;
+        }
+        th {
+            background: var(--surface);
+            color: var(--text);
+            font-weight: 600;
+            text-align: left;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+        }
+        td {
+            padding: 9px 14px;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+        tr:hover td { background: var(--surface); }
+
+        /* ---- FLOW ---- */
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .flow-step {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 18px;
+            text-align: center;
+            min-width: 140px;
+        }
+        .flow-step .step-num {
+            display: block;
+            font-size: 0.72em;
+            color: var(--accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .flow-step .step-title {
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .flow-arrow {
+            font-size: 1.4em;
+            color: var(--border);
+            padding: 0 6px;
+        }
+
+        /* ---- ARCHITECTURE ---- */
+        .arch-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .arch-node {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+        .arch-node.leader {
+            border-color: var(--accent4);
+            box-shadow: 0 0 12px rgba(240,136,62,0.15);
+        }
+        .arch-node .node-id {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .arch-node.leader .node-id { color: var(--accent4); }
+        .arch-node .node-label {
+            font-size: 0.75em;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .arch-node .node-components {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .arch-node .comp {
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--surface2);
+            color: var(--text-muted);
+        }
+        .network-label {
+            text-align: center;
+            margin-top: 12px;
+            padding: 10px;
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 0.88em;
+        }
+
+        /* ---- ALERT ---- */
+        .alert {
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-size: 0.92em;
+            border-left: 3px solid;
+        }
+        .alert-info {
+            background: #58a6ff0a;
+            border-color: var(--accent);
+            color: var(--text-muted);
+        }
+        .alert-success {
+            background: #3fb9500a;
+            border-color: var(--accent2);
+        }
+        .alert-warn {
+            background: #f0883e0a;
+            border-color: var(--accent4);
+        }
+        .alert strong { color: var(--text); }
+
+        /* ---- LIST ---- */
+        ul, ol {
+            margin: 10px 0 18px 24px;
+            color: var(--text-muted);
+        }
+        li { margin-bottom: 6px; }
+        li strong { color: var(--text); }
+
+        /* ---- FOOTER ---- */
+        .footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.88em;
+        }
+        .footer a { color: var(--accent); text-decoration: none; }
+        .footer .refs {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .footer .refs li {
+            font-size: 0.9em;
+            margin-bottom: 4px;
+        }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8em; }
+            .arch-grid { grid-template-columns: repeat(3, 1fr); }
+            .cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<header class="hero">
+    <div class="container">
+        <h1>Algoritmos <span>Distribuídos</span></h1>
+        <p class="subtitle">MC714 - Sistemas Distribuídos | Instituto de Computacao - UNICAMP</p>
+        <div class="badges">
+            <span class="badge go"><span class="dot dot-go"></span> Go 1.22</span>
+            <span class="badge docker"><span class="dot dot-docker"></span> Docker Compose</span>
+            <span class="badge tcp"><span class="dot" style="background:var(--accent2)"></span> TCP/JSON</span>
+            <span class="badge nodes"><span class="dot" style="background:var(--accent4)"></span> 5 Processos</span>
+        </div>
+    </div>
+</header>
+
+<!-- ==================== NAV ==================== -->
+<nav class="nav-bar">
+    <div class="container">
+        <a href="#visão-geral">Visão Geral</a>
+        <a href="#arquitetura">Arquitetura</a>
+        <a href="#lamport">Lamport</a>
+        <a href="#ricart">Ricart-Agrawala</a>
+        <a href="#bully">Bully</a>
+        <a href="#rede">Camada de Rede</a>
+        <a href="#testes">Testes Automatizados</a>
+        <a href="#integracao">Integracao</a>
+        <a href="#docker">Docker</a>
+        <a href="#execucao">Execucao</a>
+    </div>
+</nav>
+
+<!-- ==================== 1. VISAO GERAL ==================== -->
+<section id="visão-geral">
+    <div class="container">
+        <h2><span class="num">01.</span> Visão Geral do Projeto</h2>
+        <p class="section-desc">Tres algoritmos fundamentais de sistemas distribuídos implementados com comunicação real via sockets TCP.</p>
+
+        <div class="cards">
+            <div class="card">
+                <div class="icon">&#9202;</div>
+                <h4>Relógio Lógico de Lamport</h4>
+                <p>Ordenacao causal de eventos entre processos distribuídos sem relógio global. Cada processo mantem um contador lógico que avança com eventos locais e troca de mensagens.</p>
+                <span class="tag tag-lamport">Lamport, 1978</span>
+            </div>
+            <div class="card">
+                <div class="icon">&#128274;</div>
+                <h4>Exclusão Mútua Distribuida</h4>
+                <p>Algoritmo de Ricart-Agrawala para garantir acesso exclusivo a recurso compartilhado. Baseado em permissão: processo pede autorizacao a todos os outros.</p>
+                <span class="tag tag-mutex">Ricart &amp; Agrawala, 1981</span>
+            </div>
+            <div class="card">
+                <div class="icon">&#128081;</div>
+                <h4>Eleição de Líder (Bully)</h4>
+                <p>Eleição automatica quando o líder falha. O processo com maior ID entre os vivos assume a liderança. Deteccao de falha via heartbeat com timeout.</p>
+                <span class="tag tag-bully">Garcia-Molina, 1982</span>
+            </div>
+        </div>
+
+        <h3>O Problema Fundamental</h3>
+        <p>Em um sistema distribuído, cada processo tem seu próprio relógio (dessincronizado), não possui visão global do estado dos outros processos, e so pode obter informacoes trocando mensagens com latencia variavel. Isso gera três problemas classicos:</p>
+
+        <table>
+            <thead>
+                <tr><th>Problema</th><th>Solução Implementada</th><th>Complexidade</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>"Em que ordem os eventos aconteceram?"</td><td>Relógio Lógico de Lamport</td><td>O(1) por evento</td></tr>
+                <tr><td>"Como garantir acesso exclusivo ao recurso?"</td><td>Ricart-Agrawala</td><td>2(N-1) msgs por entrada</td></tr>
+                <tr><td>"Quem coordena quando o líder cai?"</td><td>Algoritmo Bully</td><td>O(N&sup2;) pior caso</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ==================== 2. ARQUITETURA ==================== -->
+<section id="arquitetura">
+    <div class="container">
+        <h2><span class="num">02.</span> Arquitetura da Solução</h2>
+        <p class="section-desc">5 processos distribuídos em containers Docker, comunicando-se via TCP com mensagens JSON.</p>
+
+        <h3>Decisoes Tecnicas</h3>
+        <table>
+            <thead><tr><th>Aspecto</th><th>Escolha</th><th>Justificativa</th></tr></thead>
+            <tbody>
+                <tr><td>Linguagem</td><td><strong>Go 1.22</strong></td><td>Concorrencia nativa (goroutines/channels), ideal para SD</td></tr>
+                <tr><td>Comunicação</td><td><strong>Sockets TCP</strong></td><td>Troca de mensagens real, sem dependencias extras</td></tr>
+                <tr><td>Formato</td><td><strong>JSON sobre TCP</strong></td><td>Legivel, facil de depurar, <code>encoding/json</code> nativo</td></tr>
+                <tr><td>Ambiente</td><td><strong>Docker Compose</strong></td><td>Simula N processos distribuídos na mesma maquina</td></tr>
+                <tr><td>Processos</td><td><strong>5 containers</strong></td><td>Suficiente para demonstrar todos os algoritmos</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Topologia dos Nos</h3>
+        <div class="arch-grid">
+            <div class="arch-node">
+                <div class="node-id">N1</div>
+                <div class="node-label">node1 (id=1)</div>
+                <div class="node-components">
+                    <span class="comp">Lamport Clock</span>
+                    <span class="comp">Ricart-Agrawala</span>
+                    <span class="comp">Bully Election</span>
+                </div>
+            </div>
+            <div class="arch-node">
+                <div class="node-id">N2</div>
+                <div class="node-label">node2 (id=2)</div>
+                <div class="node-components">
+                    <span class="comp">Lamport Clock</span>
+                    <span class="comp">Ricart-Agrawala</span>
+                    <span class="comp">Bully Election</span>
+                </div>
+            </div>
+            <div class="arch-node">
+                <div class="node-id">N3</div>
+                <div class="node-label">node3 (id=3)</div>
+                <div class="node-components">
+                    <span class="comp">Lamport Clock</span>
+                    <span class="comp">Ricart-Agrawala</span>
+                    <span class="comp">Bully Election</span>
+                </div>
+            </div>
+            <div class="arch-node">
+                <div class="node-id">N4</div>
+                <div class="node-label">node4 (id=4)</div>
+                <div class="node-components">
+                    <span class="comp">Lamport Clock</span>
+                    <span class="comp">Ricart-Agrawala</span>
+                    <span class="comp">Bully Election</span>
+                </div>
+            </div>
+            <div class="arch-node leader">
+                <div class="node-id">N5</div>
+                <div class="node-label">node5 (id=5) - LIDER</div>
+                <div class="node-components">
+                    <span class="comp">Lamport Clock</span>
+                    <span class="comp">Ricart-Agrawala</span>
+                    <span class="comp">Bully + Heartbeat</span>
+                </div>
+            </div>
+        </div>
+        <div class="network-label">Docker Network (bridge) &mdash; Comunicação TCP/JSON ponto-a-ponto na porta 5000</div>
+
+        <h3>Estrutura de Diretorios</h3>
+        <pre><code>lab2/
+&#9500;&#9472;&#9472; docker-compose.yml          <span class="cm"># Define os 5 containers</span>
+&#9500;&#9472;&#9472; Dockerfile                  <span class="cm"># Multi-stage build: compila Go + imagem minima</span>
+&#9500;&#9472;&#9472; go.mod                      <span class="cm"># Módulo Go</span>
+&#9500;&#9472;&#9472; cmd/
+&#9474;   &#9492;&#9472;&#9472; node/
+&#9474;       &#9492;&#9472;&#9472; main.go             <span class="cm"># Ponto de entrada: integra os 3 algoritmos</span>
+&#9492;&#9472;&#9472; internal/
+    &#9500;&#9472;&#9472; clock/
+    &#9474;   &#9500;&#9472;&#9472; lamport.go          <span class="cm"># Relógio lógico de Lamport</span>
+    &#9474;   &#9492;&#9472;&#9472; lamport_test.go     <span class="cm"># Testes unitários do relógio</span>
+    &#9500;&#9472;&#9472; mutex/
+    &#9474;   &#9500;&#9472;&#9472; ricart_agrawala.go  <span class="cm"># Exclusão mútua distribuida</span>
+    &#9474;   &#9492;&#9472;&#9472; ricart_agrawala_test.go <span class="cm"># Testes unitários com Mock</span>
+    &#9500;&#9472;&#9472; election/
+    &#9474;   &#9500;&#9472;&#9472; bully.go            <span class="cm"># Eleição de líder</span>
+    &#9474;   &#9492;&#9472;&#9472; bully_test.go       <span class="cm"># Testes unitários com Mock</span>
+    &#9500;&#9472;&#9472; network/
+    &#9474;   &#9500;&#9472;&#9472; transport.go        <span class="cm"># Camada de comunicação (interface Transporter e struct Transport)</span>
+    &#9474;   &#9492;&#9472;&#9472; message.go          <span class="cm"># Tipos de mensagem</span>
+    &#9492;&#9472;&#9472; config/
+        &#9492;&#9472;&#9472; config.go           <span class="cm"># Configuração via env vars</span>
+tests/
+└── e2e_test.go                 <span class="cm"># Testes End-to-End via Docker Compose</span></code></pre>
+
+        <h3>Mapeamento Go &harr; Conceitos de Sistemas Distribuídos</h3>
+        <table>
+            <thead><tr><th>Conceito de SD</th><th>Recurso Go</th><th>Como e usado</th></tr></thead>
+            <tbody>
+                <tr><td>Processo distribuído</td><td>Container Docker + binario Go</td><td>Cada container executa uma instancia do mesmo binario</td></tr>
+                <tr><td>Troca de mensagens</td><td><code>net.Conn</code> + <code>encoding/json</code></td><td>Conexões TCP ponto-a-ponto com JSON</td></tr>
+                <tr><td>Processamento concorrente</td><td><code>goroutines</code></td><td>Cada conexão, heartbeat e eleição roda em goroutine</td></tr>
+                <tr><td>Sincronizacao intra-processo</td><td><code>sync.Mutex</code></td><td>Protege relógio lógico e estado do mutex distribuído</td></tr>
+                <tr><td>Espera por N replies</td><td><code>chan struct{}</code></td><td>Channel como semaforo: bloqueia até N sinais</td></tr>
+                <tr><td>Timeout de eleição</td><td><code>select</code> + <code>time.After</code></td><td>Espera resposta ou timeout, o que vier primeiro</td></tr>
+                <tr><td>Heartbeat periodico</td><td><code>time.NewTicker</code></td><td>Gera eventos a cada N segundos sem busy-waiting</td></tr>
+                <tr><td>Deteccao de falha</td><td><code>net.DialTimeout</code> retorna erro</td><td>Se <code>Send()</code> falha, o nó destino esta morto</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ==================== 3. LAMPORT ==================== -->
+<section id="lamport">
+    <div class="container">
+        <h2><span class="num">03.</span> Relógio Lógico de Lamport</h2>
+        <p class="section-desc">Ordenacao causal de eventos sem relógio global &mdash; base para os demais algoritmos.</p>
+
+        <h3>Conceito Teorico</h3>
+        <p>Leslie Lamport (1978) definiu a relacao <strong>"happened-before"</strong> (<code>&rarr;</code>):</p>
+        <ol>
+            <li><strong>Dentro de um processo:</strong> Se o evento <code>a</code> ocorre antes de <code>b</code> em P, entao <code>a &rarr; b</code></li>
+            <li><strong>Entre processos:</strong> Se <code>a</code> e o envio de uma msg por P1 e <code>b</code> e o recebimento por P2, entao <code>a &rarr; b</code></li>
+            <li><strong>Transitividade:</strong> Se <code>a &rarr; b</code> e <code>b &rarr; c</code>, entao <code>a &rarr; c</code></li>
+        </ol>
+
+        <h3>Regras do Algoritmo</h3>
+        <div class="alert alert-info">
+            <strong>Regra 1:</strong> Evento local &rarr; <code>relógio = relógio + 1</code><br>
+            <strong>Regra 2:</strong> Envio de mensagem &rarr; <code>relógio = relógio + 1</code>, anexa relógio na msg<br>
+            <strong>Regra 3:</strong> Recebimento &rarr; <code>relógio = max(relógio, timestamp_recebido) + 1</code>
+        </div>
+
+        <div class="diagram-box">
+            <div class="title">Exemplo Visual &mdash; Relógio de Lamport</div>
+<pre>Processo P1          Processo P2          Processo P3
+(relógio=0)          (relógio=0)          (relógio=0)
+
+[evento local]
+relógio=1
+     |
+     |---msg(ts=1)--&gt;
+                     relógio=max(0,1)+1=2
+                     [evento local]
+                     relógio=3
+                          |
+                          |---msg(ts=3)--&gt;
+                                          relógio=max(0,3)+1=4
+                                          [evento local]
+                                          relógio=5</pre>
+        </div>
+
+        <p><strong>Garantia:</strong> Se <code>a &rarr; b</code>, entao <code>L(a) &lt; L(b)</code>. O timestamp lógico respeita a causalidade.</p>
+
+        <h3>Implementação &mdash; <code>internal/clock/lamport.go</code></h3>
+
+        <div class="code-header"><span class="dot dot-go"></span> lamport.go</div>
+<pre><code><span class="kw">type</span> <span class="tp">LamportClock</span> <span class="kw">struct</span> {
+    mu   sync.Mutex
+    time <span class="tp">int</span>
+}
+
+<span class="cm">// Tick incrementa o relógio para evento local</span>
+<span class="kw">func</span> (lc *<span class="tp">LamportClock</span>) <span class="fn">Tick</span>() <span class="tp">int</span> {
+    lc.mu.Lock()
+    <span class="kw">defer</span> lc.mu.Unlock()
+    lc.time++
+    <span class="kw">return</span> lc.time
+}
+
+<span class="cm">// SendTick incrementa e retorna timestamp para a mensagem</span>
+<span class="kw">func</span> (lc *<span class="tp">LamportClock</span>) <span class="fn">SendTick</span>() <span class="tp">int</span> {
+    lc.mu.Lock()
+    <span class="kw">defer</span> lc.mu.Unlock()
+    lc.time++
+    <span class="kw">return</span> lc.time
+}
+
+<span class="cm">// ReceiveTick: max(local, recebido) + 1</span>
+<span class="kw">func</span> (lc *<span class="tp">LamportClock</span>) <span class="fn">ReceiveTick</span>(receivedTimestamp <span class="tp">int</span>) <span class="tp">int</span> {
+    lc.mu.Lock()
+    <span class="kw">defer</span> lc.mu.Unlock()
+    <span class="kw">if</span> receivedTimestamp &gt; lc.time {
+        lc.time = receivedTimestamp
+    }
+    lc.time++
+    <span class="kw">return</span> lc.time
+}</code></pre>
+
+        <div class="alert alert-success">
+            <strong>Por que <code>sync.Mutex</code>?</strong> Multiplas goroutines (servidor TCP, heartbeat, eleição) acessam o relógio concorrentemente. Sem o mutex, haveria race condition. Go detecta isso com <code>go test -race</code>.
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 4. RICART-AGRAWALA ==================== -->
+<section id="ricart">
+    <div class="container">
+        <h2><span class="num">04.</span> Exclusão Mútua &mdash; Ricart-Agrawala</h2>
+        <p class="section-desc">Acesso exclusivo a recurso compartilhado sem coordenador central &mdash; baseado em permissão.</p>
+
+        <h3>Conceito Teorico</h3>
+        <p>O algoritmo de Ricart-Agrawala e uma otimizacao do algoritmo original de Lamport para exclusão mútua. Usa timestamps logicos para desempatar pedidos simultaneos.</p>
+
+        <h4>Estados de cada processo</h4>
+        <div class="flow">
+            <div class="flow-step"><span class="step-num">Estado</span><span class="step-title" style="color:var(--accent2)">RELEASED</span></div>
+            <span class="flow-arrow">&rarr;</span>
+            <div class="flow-step"><span class="step-num">Estado</span><span class="step-title" style="color:var(--accent4)">WANTED</span></div>
+            <span class="flow-arrow">&rarr;</span>
+            <div class="flow-step"><span class="step-num">Estado</span><span class="step-title" style="color:var(--danger)">HELD</span></div>
+            <span class="flow-arrow">&rarr;</span>
+            <div class="flow-step"><span class="step-num">Estado</span><span class="step-title" style="color:var(--accent2)">RELEASED</span></div>
+        </div>
+
+        <h4>Protocolo</h4>
+        <div class="alert alert-info">
+            <strong>Para ENTRAR:</strong> Seta estado=WANTED, envia REQUEST(ts, id) para todos, aguarda N-1 REPLYs, seta estado=HELD.<br><br>
+            <strong>Ao RECEBER REQUEST:</strong><br>
+            &bull; Se RELEASED &rarr; envia REPLY imediatamente<br>
+            &bull; Se HELD &rarr; enfileira o REQUEST<br>
+            &bull; Se WANTED &rarr; compara timestamps (menor ts tem prioridade; desempata por menor ID)<br><br>
+            <strong>Para SAIR:</strong> Seta estado=RELEASED, envia REPLY para todos os enfileirados.
+        </div>
+
+        <div class="diagram-box">
+            <div class="title">Diagrama de Sequencia &mdash; Dois processos concorrentes (mesmo timestamp)</div>
+<pre>P1 (id=1)              P2 (id=2)              P3 (id=3)
+
+[Quer entrar, ts=3]    [Quer entrar, ts=3]
+REQ(3,1)------&gt;        REQ(3,2)------&gt;
+REQ(3,1)-----------------------------&gt;
+               &lt;-------REQ(3,2)
+                       REQ(3,2)------&gt;
+
+P3 esta RELEASED:
+  Responde REPLY para P1 e P2
+
+P1 recebe REQ(3,2):
+  ts iguais, id1(1) &lt; id2(2) =&gt; P1 tem prioridade
+  P1 ENFILEIRA o request de P2
+
+P2 recebe REQ(3,1):
+  ts iguais, id1(1) &lt; id2(2) =&gt; P1 tem prioridade
+  P2 envia REPLY para P1
+
+P1: recebeu REPLY de P2 + P3 =&gt; ENTRA na SC
+P2: recebeu REPLY de P3, espera REPLY de P1
+
+[P1 sai da SC] =&gt; envia REPLY para P2 (enfileirado)
+P2: recebeu REPLY de P1 =&gt; ENTRA na SC</pre>
+        </div>
+
+        <h3>Implementação &mdash; <code>internal/mutex/ricart_agrawala.go</code></h3>
+
+        <div class="code-header"><span class="dot dot-go"></span> ricart_agrawala.go &mdash; RequestCS (solicitar seção crítica)</div>
+<pre><code><span class="kw">func</span> (ra *<span class="tp">RicartAgrawala</span>) <span class="fn">RequestCS</span>() {
+    ra.mu.Lock()
+    ra.state = Wanted
+    ra.requestTimestamp = ra.clock.<span class="fn">SendTick</span>()
+    ts := ra.requestTimestamp
+    ra.mu.Unlock()
+
+    <span class="cm">// Broadcast REQUEST para todos os outros nos</span>
+    ra.transport.<span class="fn">Broadcast</span>(network.Message{
+        Type:      <span class="st">"REQUEST"</span>,
+        SenderID:  ra.nodeID,
+        Timestamp: ts,
+    })
+
+    <span class="cm">// Aguarda N-1 replies via channel (bloqueia)</span>
+    needed := ra.totalNodes - <span class="num">1</span>
+    <span class="kw">for</span> i := <span class="num">0</span>; i &lt; needed; i++ {
+        &lt;-ra.replyChan   <span class="cm">// bloqueia até receber sinal</span>
+    }
+
+    ra.mu.Lock()
+    ra.state = Held
+    ra.mu.Unlock()
+}</code></pre>
+
+        <div class="code-header"><span class="dot dot-go"></span> ricart_agrawala.go &mdash; handleRequest (decidir REPLY ou enfileirar)</div>
+<pre><code><span class="kw">func</span> (ra *<span class="tp">RicartAgrawala</span>) <span class="fn">handleRequest</span>(msg network.Message) {
+    ra.clock.<span class="fn">ReceiveTick</span>(msg.Timestamp)
+    ra.mu.Lock()
+    <span class="kw">defer</span> ra.mu.Unlock()
+
+    shouldDefer := <span class="kw">false</span>
+
+    <span class="kw">switch</span> ra.state {
+    <span class="kw">case</span> Held:
+        shouldDefer = <span class="kw">true</span>   <span class="cm">// estou na SC, enfileira</span>
+    <span class="kw">case</span> Wanted:
+        <span class="kw">if</span> msg.Timestamp &gt; ra.requestTimestamp {
+            shouldDefer = <span class="kw">true</span> <span class="cm">// meu pedido e mais antigo</span>
+        } <span class="kw">else if</span> msg.Timestamp == ra.requestTimestamp &amp;&amp;
+                  msg.SenderID &gt; ra.nodeID {
+            shouldDefer = <span class="kw">true</span> <span class="cm">// mesmo ts, meu ID menor = prioridade</span>
+        }
+    <span class="kw">case</span> Released:
+        <span class="cm">// não quero entrar, REPLY imediato</span>
+    }
+
+    <span class="kw">if</span> shouldDefer {
+        ra.deferredReplies = <span class="fn">append</span>(ra.deferredReplies, msg.SenderID)
+    } <span class="kw">else</span> {
+        <span class="kw">go</span> ra.transport.<span class="fn">Send</span>(msg.SenderID, network.Message{
+            Type: <span class="st">"REPLY"</span>, SenderID: ra.nodeID,
+            Timestamp: ra.clock.<span class="fn">SendTick</span>(),
+        })
+    }
+}</code></pre>
+
+        <h3>Propriedades Garantidas</h3>
+        <table>
+            <thead><tr><th>Propriedade</th><th>Descrição</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Safety</strong></td><td>No máximo 1 processo na seção crítica por vez</td></tr>
+                <tr><td><strong>Liveness</strong></td><td>Todo processo que pede eventualmente entra</td></tr>
+                <tr><td><strong>Ordenacao</strong></td><td>Pedidos atendidos na ordem dos timestamps logicos</td></tr>
+                <tr><td><strong>Complexidade</strong></td><td>2(N-1) mensagens por entrada na SC</td></tr>
+            </tbody>
+        </table>
+
+        <div class="alert alert-success">
+            <strong>Channel como semaforo:</strong> O <code>replyChan</code> e um channel Go que age como contador. A goroutine chamadora fica bloqueada em <code>&lt;-ra.replyChan</code> até receber N-1 sinais &mdash; muito mais limpo que condition variables em Java/Python.
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 5. BULLY ==================== -->
+<section id="bully">
+    <div class="container">
+        <h2><span class="num">05.</span> Eleição de Líder &mdash; Algoritmo Bully</h2>
+        <p class="section-desc">Eleição automatica quando o líder falha &mdash; o processo com maior ID vivo sempre vence.</p>
+
+        <h3>Conceito Teorico</h3>
+        <p>O nome "Bully" (valentao) vem do fato de que o processo com maior ID sempre "impoe" sua liderança sobre os menores. Cada processo tem um ID único e o líder e sempre o de maior ID entre os vivos.</p>
+
+        <h4>Tipos de Mensagem</h4>
+        <table>
+            <thead><tr><th>Mensagem</th><th>Significado</th></tr></thead>
+            <tbody>
+                <tr><td><code>ELECTION</code></td><td>"Estou iniciando uma eleição"</td></tr>
+                <tr><td><code>OK</code></td><td>"Estou vivo e tenho ID maior que você"</td></tr>
+                <tr><td><code>COORDINATOR</code></td><td>"Eu sou o novo líder"</td></tr>
+                <tr><td><code>HEARTBEAT</code></td><td>Líder envia periodicamente para provar que esta vivo</td></tr>
+            </tbody>
+        </table>
+
+        <h4>Fluxo do Algoritmo</h4>
+        <div class="flow">
+            <div class="flow-step"><span class="step-num">1</span><span class="step-title">Detecta falha do líder</span></div>
+            <span class="flow-arrow">&rarr;</span>
+            <div class="flow-step"><span class="step-num">2</span><span class="step-title">Envia ELECTION para IDs maiores</span></div>
+            <span class="flow-arrow">&rarr;</span>
+            <div class="flow-step"><span class="step-num">3</span><span class="step-title">Aguarda OK ou timeout</span></div>
+            <span class="flow-arrow">&rarr;</span>
+            <div class="flow-step"><span class="step-num">4</span><span class="step-title">Declara COORDINATOR</span></div>
+        </div>
+
+        <div class="diagram-box">
+            <div class="title">Diagrama de Sequencia &mdash; Eleição após falha do líder</div>
+<pre>P1        P2        P3        P4        P5(líder)
+ |         |         |         |         |
+ |         |         |         |         X (falha!)
+ |         |         |         |
+ |         |         | detecta |
+ |         |         | timeout |
+ |         |         |--ELEC--&gt;P4
+ |         |         |--ELEC--&gt;P5 (sem resposta)
+ |         |         |         |
+ |         |         |&lt;--OK----| (P4 vivo, ID maior)
+ |         |         |         |
+ |         |         |         |--ELEC--&gt;P5 (sem resposta)
+ |         |         |         |
+ |         |         |         | timeout!
+ |         |         |         |
+ |&lt;--------+---------+-COORD---| P4 e o novo líder!
+ |         |         |         |
+ | líder=4 | líder=4 | líder=4 | (heartbeats comecam)</pre>
+        </div>
+
+        <div class="diagram-box">
+            <div class="title">Recuperacao &mdash; P5 volta e retoma liderança</div>
+<pre>[P5 se recupera e inicia]
+
+P5 envia ELECTION para... ninguem (não ha ID &gt; 5)
+Ninguem responde (timeout) =&gt; P5 se declara líder
+P5 envia COORDINATOR(5) para P1, P2, P3, P4
+
+Todos atualizam: líder = P5 (o maior voltou!)</pre>
+        </div>
+
+        <h3>Implementação &mdash; <code>internal/election/bully.go</code></h3>
+
+        <div class="code-header"><span class="dot dot-go"></span> bully.go &mdash; Constantes e estrutura</div>
+<pre><code><span class="kw">const</span> (
+    HeartbeatInterval = <span class="num">2</span> * time.Second  <span class="cm">// intervalo entre heartbeats</span>
+    HeartbeatTimeout  = <span class="num">6</span> * time.Second  <span class="cm">// timeout para considerar líder morto</span>
+    ElectionTimeout   = <span class="num">3</span> * time.Second  <span class="cm">// timeout para aguardar OK</span>
+)
+
+<span class="kw">type</span> <span class="tp">BullyElection</span> <span class="kw">struct</span> {
+    mu                 sync.Mutex
+    nodeID             <span class="tp">int</span>
+    totalNodes         <span class="tp">int</span>
+    clock              *clock.LamportClock
+    transport          network.Transporter
+    leaderID           <span class="tp">int</span>
+    electionInProgress <span class="tp">bool</span>
+    lastHeartbeat      time.Time
+    okReceived         <span class="kw">chan struct</span>{}
+}</code></pre>
+
+        <div class="code-header"><span class="dot dot-go"></span> bully.go &mdash; StartElection</div>
+<pre><code><span class="kw">func</span> (be *<span class="tp">BullyElection</span>) <span class="fn">StartElection</span>() {
+    <span class="cm">// Evita eleicoes simultaneas</span>
+    be.mu.Lock()
+    <span class="kw">if</span> be.electionInProgress { be.mu.Unlock(); <span class="kw">return</span> }
+    be.electionInProgress = <span class="kw">true</span>
+    be.mu.Unlock()
+
+    <span class="cm">// Envia ELECTION para todos com ID maior</span>
+    sentToHigher := <span class="kw">false</span>
+    <span class="kw">for</span> id := be.nodeID + <span class="num">1</span>; id &lt;= be.totalNodes; id++ {
+        err := be.transport.<span class="fn">Send</span>(id, network.Message{
+            Type: <span class="st">"ELECTION"</span>, SenderID: be.nodeID,
+        })
+        <span class="kw">if</span> err == <span class="kw">nil</span> { sentToHigher = <span class="kw">true</span> }
+    }
+
+    <span class="kw">if</span> !sentToHigher {
+        be.<span class="fn">declareVictory</span>()  <span class="cm">// ninguem vivo acima -&gt; eu sou líder</span>
+        <span class="kw">return</span>
+    }
+
+    <span class="cm">// Espera OK ou timeout</span>
+    <span class="kw">select</span> {
+    <span class="kw">case</span> &lt;-be.okReceived:
+        <span class="cm">// alguem maior vai assumir, aguardo COORDINATOR</span>
+        be.mu.Lock()
+        be.electionInProgress = <span class="kw">false</span>
+        be.mu.Unlock()
+    <span class="kw">case</span> &lt;-time.<span class="fn">After</span>(ElectionTimeout):
+        be.<span class="fn">declareVictory</span>()  <span class="cm">// timeout, eu sou líder</span>
+    }
+}</code></pre>
+
+        <div class="code-header"><span class="dot dot-go"></span> bully.go &mdash; MonitorLeader (deteccao de falha)</div>
+<pre><code><span class="kw">func</span> (be *<span class="tp">BullyElection</span>) <span class="fn">MonitorLeader</span>() {
+    <span class="kw">for</span> {
+        time.<span class="fn">Sleep</span>(HeartbeatInterval)
+
+        be.mu.Lock()
+        isLeader := be.leaderID == be.nodeID
+        elapsed := time.<span class="fn">Since</span>(be.lastHeartbeat)
+        inElection := be.electionInProgress
+        be.mu.Unlock()
+
+        <span class="kw">if</span> !isLeader &amp;&amp; !inElection &amp;&amp; elapsed &gt; HeartbeatTimeout {
+            <span class="kw">go</span> be.<span class="fn">StartElection</span>()  <span class="cm">// líder caiu!</span>
+        }
+    }
+}</code></pre>
+
+        <div class="alert alert-warn">
+            <strong>select + time.After:</strong> O padrão Go <code>select { case &lt;-ch: ... case &lt;-time.After(d): ... }</code> modela perfeitamente o timeout do Bully &mdash; espera OK ou expira, o que vier primeiro.
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 6. CAMADA DE REDE ==================== -->
+<section id="rede">
+    <div class="container">
+        <h2><span class="num">06.</span> Camada de Rede &mdash; TCP/JSON</h2>
+        <p class="section-desc">Comunicação real entre processos via sockets TCP com mensagens JSON.</p>
+
+        <h3>Formato da Mensagem</h3>
+        <div class="code-header"><span class="dot dot-go"></span> message.go</div>
+<pre><code><span class="kw">type</span> <span class="tp">Message</span> <span class="kw">struct</span> {
+    Type      <span class="tp">string</span> <span class="st">`json:"type"`</span>            <span class="cm">// "REQUEST", "REPLY", "ELECTION", etc.</span>
+    SenderID  <span class="tp">int</span>    <span class="st">`json:"sender_id"`</span>       <span class="cm">// ID do remetente</span>
+    Timestamp <span class="tp">int</span>    <span class="st">`json:"timestamp"`</span>       <span class="cm">// Timestamp lógico de Lamport</span>
+    Data      <span class="tp">string</span> <span class="st">`json:"data,omitempty"`</span>  <span class="cm">// Dados extras (opcional)</span>
+}</code></pre>
+
+        <h3>Protocolo de Mensagens</h3>
+        <table>
+            <thead><tr><th>Tipo</th><th>Algoritmo</th><th>Descrição</th></tr></thead>
+            <tbody>
+                <tr><td><code>REQUEST</code></td><td>Ricart-Agrawala</td><td>Pedido para entrar na seção crítica</td></tr>
+                <tr><td><code>REPLY</code></td><td>Ricart-Agrawala</td><td>Permissão concedida</td></tr>
+                <tr><td><code>ELECTION</code></td><td>Bully</td><td>Início de eleição</td></tr>
+                <tr><td><code>OK</code></td><td>Bully</td><td>"Estou vivo e tenho ID maior"</td></tr>
+                <tr><td><code>COORDINATOR</code></td><td>Bully</td><td>"Eu sou o novo líder"</td></tr>
+                <tr><td><code>HEARTBEAT</code></td><td>Bully</td><td>Sinal de vida periodico do líder</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Transport &mdash; Envio e Recepcao</h3>
+        <div class="code-header"><span class="dot dot-go"></span> transport.go &mdash; Send e Broadcast</div>
+<pre><code><span class="cm">// Send envia mensagem para um nó especifico</span>
+<span class="kw">func</span> (t *<span class="tp">Transport</span>) <span class="fn">Send</span>(targetID <span class="tp">int</span>, msg Message) <span class="tp">error</span> {
+    addr := fmt.<span class="fn">Sprintf</span>(<span class="st">"node%d:5000"</span>, targetID)
+    conn, err := net.<span class="fn">DialTimeout</span>(<span class="st">"tcp"</span>, addr, <span class="num">2</span>*time.Second)
+    <span class="kw">if</span> err != <span class="kw">nil</span> {
+        <span class="kw">return</span> err  <span class="cm">// no inacessivel (pode ter caido)</span>
+    }
+    <span class="kw">defer</span> conn.Close()
+    <span class="kw">return</span> json.<span class="fn">NewEncoder</span>(conn).<span class="fn">Encode</span>(msg)
+}
+
+<span class="cm">// Broadcast envia para todos os outros nos em paralelo</span>
+<span class="kw">func</span> (t *<span class="tp">Transport</span>) <span class="fn">Broadcast</span>(msg Message) {
+    <span class="kw">for</span> id := <span class="num">1</span>; id &lt;= t.totalNodes; id++ {
+        <span class="kw">if</span> id != t.nodeID {
+            targetID := id
+            <span class="kw">go func</span>() {
+                t.<span class="fn">Send</span>(targetID, msg)
+            }()
+        }
+    }
+}</code></pre>
+
+        <div class="code-header"><span class="dot dot-go"></span> transport.go &mdash; Servidor TCP + handler</div>
+<pre><code><span class="cm">// StartServer inicia servidor TCP com goroutine por conexão</span>
+<span class="kw">func</span> (t *<span class="tp">Transport</span>) <span class="fn">StartServer</span>() {
+    listener, _ := net.<span class="fn">Listen</span>(<span class="st">"tcp"</span>, fmt.<span class="fn">Sprintf</span>(<span class="st">":%d"</span>, t.port))
+    <span class="kw">go func</span>() {
+        <span class="kw">for</span> {
+            conn, _ := listener.<span class="fn">Accept</span>()
+            <span class="kw">go</span> t.<span class="fn">handleConnection</span>(conn) <span class="cm">// goroutine por conexão</span>
+        }
+    }()
+}
+
+<span class="cm">// handleConnection decodifica JSON e despacha para handler</span>
+<span class="kw">func</span> (t *<span class="tp">Transport</span>) <span class="fn">handleConnection</span>(conn net.Conn) {
+    <span class="kw">defer</span> conn.Close()
+    <span class="kw">var</span> msg Message
+    json.<span class="fn">NewDecoder</span>(conn).<span class="fn">Decode</span>(&amp;msg)
+    <span class="kw">if</span> handler, ok := t.handlers[msg.Type]; ok {
+        <span class="fn">handler</span>(msg) <span class="cm">// despacha: "REQUEST" -&gt; handleRequest, etc.</span>
+    }
+}
+
+<span class="cm">// On registra handler por tipo de mensagem</span>
+<span class="kw">func</span> (t *<span class="tp">Transport</span>) <span class="fn">On</span>(msgType <span class="tp">string</span>, handler MessageHandler) {
+    t.handlers[msgType] = handler
+}</code></pre>
+    </div>
+</section>
+
+<!-- ==================== 7. INTEGRACAO ==================== -->
+<section id="integracao">
+    <div class="container">
+        <h2><span class="num">07.</span> Integracao &mdash; Ponto de Entrada</h2>
+        <p class="section-desc">O <code>main.go</code> integra os três algoritmos em cada nó distribuído.</p>
+
+        <h3>Fluxo de Inicializacao</h3>
+        <div class="flow">
+            <div class="flow-step"><span class="step-num">1</span><span class="step-title">Servidor TCP</span></div>
+            <span class="flow-arrow">&rarr;</span>
+            <div class="flow-step"><span class="step-num">2</span><span class="step-title">Lamport Clock</span></div>
+            <span class="flow-arrow">&rarr;</span>
+            <div class="flow-step"><span class="step-num">3</span><span class="step-title">Ricart-Agrawala</span></div>
+            <span class="flow-arrow">&rarr;</span>
+            <div class="flow-step"><span class="step-num">4</span><span class="step-title">Bully Election</span></div>
+            <span class="flow-arrow">&rarr;</span>
+            <div class="flow-step"><span class="step-num">5</span><span class="step-title">Loop Principal</span></div>
+        </div>
+
+        <div class="code-header"><span class="dot dot-go"></span> cmd/node/main.go</div>
+<pre><code><span class="kw">func</span> <span class="fn">main</span>() {
+    cfg := config.<span class="fn">LoadConfig</span>()  <span class="cm">// NODE_ID e TOTAL_NODES via env</span>
+
+    <span class="cm">// 1. Camada de rede</span>
+    transport := network.<span class="fn">NewTransport</span>(cfg.NodeID, cfg.Port, cfg.TotalNodes)
+    transport.<span class="fn">StartServer</span>()
+    time.<span class="fn">Sleep</span>(<span class="num">5</span> * time.Second)  <span class="cm">// aguarda containers Docker</span>
+
+    <span class="cm">// 2. Relógio lógico</span>
+    clk := clock.<span class="fn">NewLamportClock</span>()
+
+    <span class="cm">// 3. Exclusão Mútua</span>
+    ra := mutex.<span class="fn">NewRicartAgrawala</span>(cfg.NodeID, cfg.TotalNodes, clk, transport)
+
+    <span class="cm">// 4. Eleição de Líder</span>
+    bully := election.<span class="fn">NewBullyElection</span>(cfg.NodeID, cfg.TotalNodes, clk, transport)
+    <span class="kw">go</span> bully.<span class="fn">MonitorLeader</span>()
+
+    <span class="kw">if</span> cfg.NodeID == cfg.TotalNodes {
+        <span class="kw">go</span> bully.<span class="fn">StartElection</span>()  <span class="cm">// maior ID inicia como líder</span>
+    }
+
+    <span class="cm">// 5. Loop: solicita seção crítica periodicamente</span>
+    <span class="kw">for</span> {
+        time.<span class="fn">Sleep</span>(intervaloAleatorio)
+        clk.<span class="fn">Tick</span>()          <span class="cm">// evento local</span>
+        ra.<span class="fn">RequestCS</span>()      <span class="cm">// bloqueia até entrar</span>
+        <span class="fn">criticalWork</span>(...)  <span class="cm">// simula acesso ao recurso</span>
+        ra.<span class="fn">ReleaseCS</span>()      <span class="cm">// libera para outros</span>
+    }
+}</code></pre>
+
+        <h3>Estratégia de Logs</h3>
+        <p>Cada log inclui <code>[Node ID][Clock: N] MODULO | descrição</code> para facilitar analise:</p>
+<pre><code><span class="st">[Node 1][Clock:  3] LAMPORT  | Evento local, relógio avancou para 3</span>
+<span class="st">[Node 1][Clock:  4] LAMPORT  | Enviando msg para Node 2, timestamp=4</span>
+<span class="st">[Node 2][Clock:  5] LAMPORT  | Recebeu msg de Node 1 (ts=4), ajustou para 5</span>
+
+<span class="st">[Node 3][Clock:  7] MUTEX    | Solicitando seção crítica (REQUEST, ts=7)</span>
+<span class="st">[Node 1][Clock:  8] MUTEX    | REPLY enviado para Node 3</span>
+<span class="st">[Node 3][Clock:  9] MUTEX    | &gt;&gt;&gt; ENTRANDO na seção crítica &lt;&lt;&lt;</span>
+<span class="st">[Node 3][Clock: 12] MUTEX    | SAINDO da seção crítica</span>
+
+<span class="st">[Node 3][Clock: 15] ELECTION | Líder não responde! Iniciando eleição...</span>
+<span class="st">[Node 4][Clock: 16] ELECTION | Recebeu ELECTION de Node 3, respondendo OK</span>
+<span class="st">[Node 4][Clock: 18] ELECTION | *** Sou o novo LIDER! ***</span>
+<span class="st">[Node 1][Clock: 19] ELECTION | Novo líder: Node 4</span></code></pre>
+    </div>
+</section>
+
+<!-- ==================== 8. DOCKER ==================== -->
+<section id="docker">
+    <div class="container">
+        <h2><span class="num">08.</span> Configuração Docker</h2>
+        <p class="section-desc">Multi-stage build para imagem minima + Docker Compose para orquestrar 5 nós.</p>
+
+        <div class="cards">
+            <div class="card">
+                <h4>Dockerfile (Multi-stage)</h4>
+                <p>Estagio 1: compila Go em <code>golang:1.22-alpine</code>. Estagio 2: copia binario para <code>alpine:3.19</code>. Imagem final com ~5MB.</p>
+            </div>
+            <div class="card">
+                <h4>Docker Compose</h4>
+                <p>5 servicos (node1..node5) na mesma rede bridge. Cada no recebe <code>NODE_ID</code> e <code>TOTAL_NODES</code> via env vars. Resolucao DNS automatica: <code>node1:5000</code>.</p>
+            </div>
+        </div>
+
+        <div class="code-header"><span class="dot dot-docker"></span> Dockerfile</div>
+<pre><code><span class="cm"># Estagio 1: Compilacao</span>
+<span class="kw">FROM</span> golang:1.22-alpine <span class="kw">AS</span> builder
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> go.mod ./
+<span class="kw">RUN</span> go mod download
+<span class="kw">COPY</span> . .
+<span class="kw">RUN</span> CGO_ENABLED=0 GOOS=linux go build -o /node ./cmd/node/main.go
+
+<span class="cm"># Estagio 2: Imagem minima (~5MB)</span>
+<span class="kw">FROM</span> alpine:3.19
+<span class="kw">COPY</span> --from=builder /node /node
+<span class="kw">CMD</span> ["/node"]</code></pre>
+
+        <div class="code-header"><span class="dot dot-yaml"></span> docker-compose.yml (resumo)</div>
+<pre><code><span class="kw">version</span>: '3.8'
+<span class="kw">services</span>:
+  <span class="fn">node1</span>:
+    build: .
+    container_name: node1
+    hostname: node1
+    environment:
+      - NODE_ID=<span class="num">1</span>
+      - TOTAL_NODES=<span class="num">5</span>
+    networks: [distributed]
+  <span class="fn">node2</span>: <span class="cm"># ... mesma estrutura com NODE_ID=2</span>
+  <span class="fn">node3</span>: <span class="cm"># ... NODE_ID=3</span>
+  <span class="fn">node4</span>: <span class="cm"># ... NODE_ID=4</span>
+  <span class="fn">node5</span>: <span class="cm"># ... NODE_ID=5 (líder inicial)</span>
+
+<span class="kw">networks</span>:
+  distributed:
+    driver: bridge</code></pre>
+    </div>
+</section>
+
+<!-- ==================== 9. TESTES AUTOMATIZADOS ==================== -->
+<section id="testes">
+    <div class="container">
+        <h2><span class="num">09.</span> Testes Automatizados</h2>
+        <p class="section-desc">Uma suíte de testes robusta (Unitários + End-to-End) garantindo a integridade dos algoritmos.</p>
+
+        <div class="cards">
+            <div class="card">
+                <h4>Testes Unitários (Mocks)</h4>
+                <p>Para isolar os testes da rede real, extraímos a interface <code>network.Transporter</code>. Isso permitiu criar um <strong>MockTransport</strong> que simula o envio/recebimento de mensagens, testando a lógica interna de cada pacote (<code>clock</code>, <code>mutex</code>, <code>election</code>) de forma independente.</p>
+            </div>
+            <div class="card">
+                <h4>Teste End-to-End (E2E)</h4>
+                <p>Implementado em <code>tests/e2e_test.go</code>, este teste orquestra o sistema executando <code>docker-compose up</code>, capturando logs reais de produção e verificando se a Seção Crítica foi respeitada e se o líder foi eleito sem anomalias, garantindo que tudo funciona junto.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 10. EXECUCAO ==================== -->
+<section id="execucao">
+    <div class="container">
+        <h2><span class="num">10.</span> Como Executar e Simular Falhas</h2>
+        <p class="section-desc">Comandos para executar o sistema, testes e simulacao de falhas.</p>
+
+        <h3>Comandos Basicos</h3>
+<pre><code><span class="cm"># Construir e iniciar todos os 5 nós</span>
+$ docker-compose up --build
+
+<span class="cm"># Em outro terminal, acompanhar logs de um nó</span>
+$ docker logs -f node1
+
+<span class="cm"># Parar tudo</span>
+$ docker-compose down</code></pre>
+
+        <h3>Cenários de Demonstração</h3>
+
+        <div class="cards">
+            <div class="card">
+                <h4>Cenario 1: Relógio de Lamport</h4>
+                <p>Observe nos logs os timestamps <code>[Clock: N]</code> avancando. Mensagens enviadas tem ts menor que o ts de recebimento, demonstrando causalidade.</p>
+                <span class="tag tag-lamport">Automatico</span>
+            </div>
+            <div class="card">
+                <h4>Cenario 2: Exclusão Mútua</h4>
+                <p>Múltiplos nos solicitam SC periodicamente. Verifique que logs <code>SECAO CRITICA</code> nunca se sobrepoem entre nós diferentes.</p>
+                <span class="tag tag-mutex">Automatico</span>
+            </div>
+            <div class="card">
+                <h4>Cenario 3: Falha do Líder</h4>
+                <p>Execute <code>docker stop node5</code> e observe a eleição automatica nos logs. Node4 assume como líder.</p>
+                <span class="tag tag-bully">Manual</span>
+            </div>
+            <div class="card">
+                <h4>Cenario 4: Recuperacao</h4>
+                <p>Execute <code>docker start node5</code> e observe Node5 retomando a liderança automaticamente (Bully).</p>
+                <span class="tag tag-bully">Manual</span>
+            </div>
+        </div>
+
+        <h3>Simulacao de Falhas</h3>
+<pre><code><span class="cm"># Cenario 3: Derrubar o líder</span>
+$ docker stop node5
+<span class="cm"># Observe nos logs: eleição automatica, node4 vira líder</span>
+
+<span class="cm"># Cenario 4: Recuperar o líder original</span>
+$ docker start node5
+<span class="cm"># Observe: node5 retoma liderança (maior ID)</span>
+
+<span class="cm"># Cenario extra: Derrubar dois nos</span>
+$ docker stop node5 node4
+<span class="cm"># Observe: node3 assume como líder</span></code></pre>
+
+        <div class="alert alert-info">
+            <strong>Dica para o video:</strong> Use <code>docker-compose up --build</code> em um terminal e <code>docker logs -f node3</code> em outro. Demonstre cada cenario pausando entre eles para explicar os logs.
+        </div>
+    </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="footer">
+    <div class="container">
+        <p><strong>MC714 - Sistemas Distribuídos</strong> | Instituto de Computacao - UNICAMP</p>
+        <p>Prof. Luiz Fernando Bittencourt</p>
+
+        <div class="refs">
+            <h4 style="color:var(--text); margin-bottom: 10px;">Referências</h4>
+            <ol>
+                <li>Lamport, L. "Time, Clocks, and the Ordering of Events in a Distributed System." <em>Communications of the ACM</em>, 1978.</li>
+                <li>Ricart, G. e Agrawala, A. K. "An Optimal Algorithm for Mutual Exclusion in Computer Networks." <em>Communications of the ACM</em>, 1981.</li>
+                <li>Garcia-Molina, H. "Elections in a Distributed Computing System." <em>IEEE Transactions on Computers</em>, 1982.</li>
+                <li>Coulouris, G., Dollimore, J., Kindberg, T. <em>Distributed Systems: Concepts and Design</em>. 5th Ed., Addison-Wesley, 2011.</li>
+                <li>Tanenbaum, A. S., Van Steen, M. <em>Distributed Systems: Principles and Paradigms</em>. 3rd Ed., Pearson, 2017.</li>
+                <li>Donovan, A., Kernighan, B. <em>The Go Programming Language</em>. Addison-Wesley, 2015.</li>
+                <li>Go Documentation - Effective Go. <a href="https://go.dev/doc/effective_go">https://go.dev/doc/effective_go</a></li>
+            </ol>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

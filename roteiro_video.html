@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roteiro de Gravação - Sistemas Distribuídos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --surface: #161b22;
+            --surface-hover: #1f2733;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --border: #30363d;
+            
+            --person-a: #58a6ff; /* Azul */
+            --person-a-bg: rgba(88, 166, 255, 0.1);
+            
+            --person-b: #3fb950; /* Verde */
+            --person-b-bg: rgba(63, 185, 80, 0.1);
+
+            --stage: #d2a8ff; /* Roxo para direções de palco */
+            --stage-bg: rgba(210, 168, 255, 0.1);
+            
+            --accent-gradient: linear-gradient(135deg, #58a6ff, #d2a8ff);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.7;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .title-gradient {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .badge-meta {
+            padding: 6px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Timeline / Blocks */
+        .script-block {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .script-block:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-color: #444c56;
+        }
+
+        .block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .block-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-badge {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #8b949e;
+            border: 1px solid var(--border);
+        }
+
+        /* Dialogues */
+        .dialogue {
+            margin-bottom: 24px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .dialogue:last-child {
+            margin-bottom: 0;
+        }
+
+        .dialogue::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            bottom: 5px;
+            width: 4px;
+            border-radius: 4px;
+        }
+
+        .speaker {
+            display: inline-block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        /* Person A Styles */
+        .dialogue.person-a::before { background-color: var(--person-a); }
+        .dialogue.person-a .speaker {
+            background: var(--person-a-bg);
+            color: var(--person-a);
+            border: 1px solid rgba(88, 166, 255, 0.2);
+        }
+
+        /* Person B Styles */
+        .dialogue.person-b::before { background-color: var(--person-b); }
+        .dialogue.person-b .speaker {
+            background: var(--person-b-bg);
+            color: var(--person-b);
+            border: 1px solid rgba(63, 185, 80, 0.2);
+        }
+
+        .text {
+            font-size: 1.05rem;
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
+        
+        .text strong {
+            color: #fff;
+        }
+
+        /* Stage Directions */
+        .stage-direction {
+            background: var(--stage-bg);
+            border-left: 4px solid var(--stage);
+            padding: 12px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            font-size: 0.95rem;
+            color: #c9d1d9;
+            font-style: italic;
+        }
+
+        .stage-direction strong {
+            color: var(--stage);
+            font-style: normal;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Progress Bar (Visual only) */
+        .progress-wrapper {
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            padding: 15px 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--surface);
+            border-radius: 3px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-gradient);
+            width: 0%;
+            animation: loadProgress 2s ease-out forwards;
+        }
+
+        @keyframes loadProgress {
+            to { width: 100%; }
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        /* Utils */
+        code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            color: #a5d6ff;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="progress-wrapper">
+        <div class="container">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="progress-labels">
+                <span>00:00</span>
+                <span>Alvo: 10:00</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1 class="title-gradient">Roteiro de Gravação - Lab 2</h1>
+            <p>Apresentação Completa e Detalhada: Sistemas Distribuídos (MC714)</p>
+            
+            <div class="meta-info">
+                <div class="badge-meta">⏱️ Duração: ~10 Minutos</div>
+                <div class="badge-meta">👥 Apresentadores: Pessoa A e Pessoa B</div>
+                <div class="badge-meta">💻 Foco: Arquitetura, Algoritmos e Testes</div>
+            </div>
+        </header>
+
+        <!-- BLOCO 1 -->
+        <div class="script-block">
+            <div class="block-header">
+                <div class="block-title">🚀 1. Introdução e Contexto</div>
+                <div class="time-badge">00:00 - 01:15 (1 min 15s)</div>
+            </div>
+
+            <div class="stage-direction">
+                <strong>Ação Visual (Tela)</strong>
+                Mostrem a capa do relatório (relatorio.html) com o título "Algoritmos Distribuídos" e as tags de Go/Docker.
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "Olá a todos! Sejam muito bem-vindos. Nós somos alunos da disciplina de Sistemas Distribuídos (MC714) da UNICAMP. Eu sou o <strong>[Seu Nome]</strong>, e hoje apresentarei o Laboratório 2 ao lado do meu colega <strong>[Nome do Colega]</strong>."
+                </div>
+            </div>
+
+            <div class="dialogue person-b">
+                <div class="speaker">Pessoa B</div>
+                <div class="text">
+                    "Olá pessoal! O objetivo deste laboratório foi mergulhar na prática de sistemas descentralizados. Construímos um ecossistema completo com 5 nós independentes para resolver três dos problemas mais clássicos e difíceis em sistemas distribuídos: <strong>Ordenação de Eventos, Exclusão Mútua e Eleição de Líder</strong>."
+                </div>
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "Para alcançar isso, escolhemos a linguagem <strong>Go</strong> (Golang). A concorrência nativa do Go, usando <code>goroutines</code> e <code>channels</code>, nos permitiu lidar com múltiplas conexões e algoritmos rodando em paralelo no mesmo nó de forma muito natural e segura."
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOCO 2 -->
+        <div class="script-block">
+            <div class="block-header">
+                <div class="block-title">🏗️ 2. Arquitetura da Solução</div>
+                <div class="time-badge">01:15 - 02:45 (1 min 30s)</div>
+            </div>
+
+            <div class="stage-direction">
+                <strong>Ação Visual (Tela)</strong>
+                Rolem o HTML para a seção "Arquitetura da Solução", mostrando o diagrama "Topologia dos Nós" (N1 a N5).
+            </div>
+
+            <div class="dialogue person-b">
+                <div class="speaker">Pessoa B</div>
+                <div class="text">
+                    "Antes de mergulhar no código, vamos entender a fundação. Orquestramos <strong>5 processos distribuídos usando Docker Compose</strong>. Cada contêiner roda o exato mesmo binário compilado em Go, mas atua de forma autônoma."
+                </div>
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "Na parte de comunicação, não usamos abstrações de alto nível como gRPC ou HTTP. Fomos direto na veia: implementamos <strong>Sockets TCP puros</strong> na porta 5000. Todas as mensagens trocadas na rede são objetos <strong>JSON</strong> estruturados, o que facilitou muito nossa vida na hora de depurar."
+                </div>
+            </div>
+
+            <div class="dialogue person-b">
+                <div class="speaker">Pessoa B</div>
+                <div class="text">
+                    "E como lidamos com rede TCP assíncrona, temporizadores de eleição e recebimento de requisições tudo ao mesmo tempo no mesmo nó? Usamos <code>goroutines</code>. Para evitar que duas tarefas alterassem uma mesma variável ao mesmo tempo (o temido Race Condition), nós blindamos o estado interno dos processos utilizando a estrutura <code>sync.Mutex</code> do pacote de sincronização do Go."
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOCO 3 -->
+        <div class="script-block">
+            <div class="block-header">
+                <div class="block-title">⏱️ 3. Relógio Lógico de Lamport</div>
+                <div class="time-badge">02:45 - 04:30 (1 min 45s)</div>
+            </div>
+
+            <div class="stage-direction">
+                <strong>Ação Visual (Tela)</strong>
+                Mostrem o arquivo <code>internal/clock/lamport.go</code> no editor de código, ou a seção 03 do relatório.
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "Entrando agora no coração do projeto: O Algoritmo de Lamport. Em sistemas distribuídos, não existe um 'horário global'. Então como sabemos a ordem dos eventos? Lamport resolve isso usando a relação de causalidade."
+                </div>
+            </div>
+
+            <div class="dialogue person-b">
+                <div class="speaker">Pessoa B</div>
+                <div class="text">
+                    "Para isso, escrevemos a struct <code>LamportClock</code>. A regra é rígida e implementamos em 3 funções cruciais. Primeiro, qualquer evento puramente local dentro do nó aciona a função <code>Tick()</code>, que apenas soma 1 ao relógio."
+                </div>
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "Segundo: se o nó vai enviar uma mensagem pela rede TCP, ele chama a função <code>SendTick()</code>. Ele soma 1 ao próprio relógio e <strong>anexa</strong> esse timestamp no JSON da mensagem."
+                </div>
+            </div>
+
+            <div class="dialogue person-b">
+                <div class="speaker">Pessoa B</div>
+                <div class="text">
+                    "E o terceiro é o mais importante: Ao receber uma mensagem, nós chamamos a <code>ReceiveTick(ts)</code>. Ela compara o relógio local do nó com o relógio que chegou na mensagem, pega <strong>o maior valor entre os dois</strong>, e soma 1. Isso garante que a linha do tempo do recebedor sempre seja empurrada para frente caso o remetente estivesse num 'futuro lógico'."
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOCO 4 -->
+        <div class="script-block">
+            <div class="block-header">
+                <div class="block-title">🔒 4. Ricart-Agrawala (Exclusão Mútua)</div>
+                <div class="time-badge">04:30 - 06:45 (2 min 15s)</div>
+            </div>
+
+            <div class="stage-direction">
+                <strong>Ação Visual (Tela)</strong>
+                Mudem para o arquivo <code>internal/mutex/ricart_agrawala.go</code> (focar na função <code>RequestCS</code> e <code>HandleRequest</code>) ou no fluxo de estados (RELEASED -> WANTED -> HELD) do relatório HTML.
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "Com a linha do tempo garantida por Lamport, enfrentamos o problema de exclusão mútua. Como garantir que dois nós não acessem um mesmo banco de dados ou arquivo simultaneamente, sem usar um servidor central para gerenciar filas? Usamos o algoritmo de <strong>Ricart-Agrawala</strong>."
+                </div>
+            </div>
+
+            <div class="dialogue person-b">
+                <div class="speaker">Pessoa B</div>
+                <div class="text">
+                    "A lógica de estado do nó se baseia em permissões e possui 3 fases: <code>RELEASED</code> (livre), <code>WANTED</code> (quer acessar) e <code>HELD</code> (está na seção crítica). Quando queremos acessar o recurso, mudamos para <code>WANTED</code> e enviamos um <code>REQUEST</code> via broadcast (para todos os outros 4 nós)."
+                </div>
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "O verdadeiro brilho da nossa implementação está em <strong>quem recebe</strong> a mensagem. Se o nó recebedor está <code>RELEASED</code>, ele responde com um <code>REPLY</code> na mesma hora. Se ele já está na seção crítica (<code>HELD</code>), ele trava a resposta e enfileira a requisição numa lista em memória."
+                </div>
+            </div>
+
+            <div class="dialogue person-b">
+                <div class="speaker">Pessoa B</div>
+                <div class="text">
+                    "E o cenário mais crítico: e se os dois nós estiverem em <code>WANTED</code>, brigando pela seção crítica ao mesmo tempo? 
+Neste caso de colisão, nós comparamos os timestamps do pedido. Quem pediu mais cedo logicamente ganha a permissão. Se os timestamps forem bizarramente idênticos, usamos o ID numérico do nó como desempate matemático. 
+O nó só altera seu estado para <code>HELD</code> após receber os exatos 4 <code>REPLYs</code> esperados. É um controle de concorrência perfeito e totalmente descentralizado."
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOCO 5 -->
+        <div class="script-block">
+            <div class="block-header">
+                <div class="block-title">👑 5. Algoritmo Bully (Eleição de Líder)</div>
+                <div class="time-badge">06:45 - 08:15 (1 min 30s)</div>
+            </div>
+
+            <div class="stage-direction">
+                <strong>Ação Visual (Tela)</strong>
+                Mostrem a lógica de timeout no <code>internal/election/bully.go</code> ou o esquema na arquitetura.
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "Para completar, precisamos de tolerância a falhas. Implementamos o <strong>Algoritmo Bully</strong> para reeleger um líder automaticamente se o nó principal cair."
+                </div>
+            </div>
+
+            <div class="dialogue person-b">
+                <div class="speaker">Pessoa B</div>
+                <div class="text">
+                    "A arquitetura funciona assim: nós mantemos um gatilho constante via `time.NewTicker` no Go para emitir pulsos (Heartbeats). Se a tentativa de envio via TCP retornar erro, sabemos instantaneamente que o líder caiu. O nó que detectou isso convoca uma eleição."
+                </div>
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "O Bully opera pela lei do mais forte. O nosso nó só envia a mensagem <code>ELECTION</code> para processos com ID estritamente <strong>maior</strong> que o dele. 
+Se um nó maior estiver vivo, ele obrigatoriamente responde com um <code>OK</code>. Esse <code>OK</code> interrompe a tentativa do nó menor, e o nó maior assume o controle, iniciando sua própria eleição."
+                </div>
+            </div>
+
+            <div class="dialogue person-b">
+                <div class="speaker">Pessoa B</div>
+                <div class="text">
+                    "Quando chegamos num nó onde ninguém maior responde (por exemplo, o Nó 4, caso o Nó 5 tenha caído), o timeout de rede aciona, e ele se autodeclara vencedor, mandando uma mensagem de <code>COORDINATOR</code> para todos os nós vivos abaixo dele se reorganizarem."
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOCO 6 -->
+        <div class="script-block">
+            <div class="block-header">
+                <div class="block-title">✅ 6. Qualidade de Software e Testes</div>
+                <div class="time-badge">08:15 - 09:30 (1 min 15s)</div>
+            </div>
+
+            <div class="stage-direction">
+                <strong>Ação Visual (Tela)</strong>
+                Transição rápida para o relatório de testes (relatorio_testes.html). Mostrem os Cards Verdes (12 testes totais).
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "Nada em sistemas distribuídos pode ir para produção sem uma malha pesada de testes. E nós tivemos um zelo absurdo com isso. Como vocês podem ver no nosso relatório de testes automatizados, desenhamos uma suite com <strong>12 testes robustos</strong>."
+                </div>
+            </div>
+
+            <div class="dialogue person-b">
+                <div class="speaker">Pessoa B</div>
+                <div class="text">
+                    "Fizemos testes unitários específicos para cada camada. No Lamport, testamos desde o incremento básico até um <strong>teste de estresse com centenas de goroutines simultâneas</strong>, validando que nossos <code>Mutex</code> seguram as *race conditions* perfeitamente."
+                </div>
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "No Ricart-Agrawala e no Bully, montamos Mocks de rede para injetar mensagens simuladas. Assim comprovamos matematicamente que a ordem causal (os conflitos do estado WANTED) e a lógica de supressão da eleição (os envios de OK) operam à risca com a literatura."
+                </div>
+            </div>
+
+            <div class="dialogue person-b">
+                <div class="speaker">Pessoa B</div>
+                <div class="text">
+                    "Por fim, temos o nosso Teste End-to-End, que constrói os 5 contêineres Docker de verdade, simula a rede e varre os logs comprovando o líder e a exclusão mútua simultaneamente em produção."
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOCO 7 -->
+        <div class="script-block">
+            <div class="block-header">
+                <div class="block-title">🎯 7. Encerramento</div>
+                <div class="time-badge">09:30 - 10:00 (30 seg)</div>
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "Em resumo, o laboratório nos forçou a sair do mundo acadêmico e enfrentar os problemas práticos de redes intermitentes e concorrência."
+                </div>
+            </div>
+
+            <div class="dialogue person-b">
+                <div class="speaker">Pessoa B</div>
+                <div class="text">
+                    "Integrando a causalidade do Lamport, a proteção do Ricart-Agrawala e a resiliência do Bully usando o poder da linguagem Go, entregamos um sistema robusto e tolerante a falhas. Foi um baita desafio técnico!"
+                </div>
+            </div>
+
+            <div class="dialogue person-a">
+                <div class="speaker">Pessoa A</div>
+                <div class="text">
+                    "Muito obrigado por assistirem à nossa apresentação. Um grande abraço!"
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
