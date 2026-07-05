@@ -12,7 +12,7 @@ func NewLamportClock() *LamportClock {
 	return &LamportClock{time: 0}
 }
 
-// incrementa o relogio para um evento local.
+// incrementa o relogio para um evento local somando 1 ao relogio local
 func (lc *LamportClock) Tick() int {
 	lc.mu.Lock()
 	defer lc.mu.Unlock()

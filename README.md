@@ -1,17 +1,17 @@
 # Lab 2 - Algoritmos Distribuidos | MC714 - UNICAMP
 
-Implementacao de tres algoritmos fundamentais de sistemas distribuidos usando Go e Docker:
+Implementação de três algoritmos fundamentais de sistemas distribuídos usando Go e Docker:
 
-1. **Relogio Logico de Lamport** - Ordenacao causal de eventos
-2. **Exclusao Mutua (Ricart-Agrawala)** - Acesso exclusivo a recurso compartilhado
-3. **Eleicao de Lider (Bully)** - Eleicao automatica quando o lider falha
+1. **Relógio Lógico de Lamport** - Ordenação causal de eventos
+2. **Exclusão Mútua (Ricart-Agrawala)** - Acesso exclusivo a recurso compartilhado
+3. **Eleição de Líder (Bully)** - Eleição automática quando o líder falha
 
 ## Arquitetura
 
 - **Linguagem:** Go 1.22+
-- **Comunicacao:** Sockets TCP com mensagens JSON
+- **Comunicação:** Sockets TCP com mensagens JSON
 - **Ambiente:** Docker Compose com 5 containers (nodes) na mesma rede bridge
-- **Processos:** 5 nos distribuidos (node1..node5), cada um rodando os 3 algoritmos
+- **Processos:** 5 nós distribuídos (node1..node5), cada um rodando os 3 algoritmos
 
 ## Estrutura do Projeto
 
@@ -25,81 +25,86 @@ lab2/
 │       └── main.go             # Ponto de entrada
 ├── internal/
 │   ├── clock/
-│   │   └── lamport.go          # Relogio logico de Lamport
+│   │   └── lamport.go          # Relógio lógico de Lamport
 │   ├── mutex/
-│   │   └── ricart_agrawala.go  # Exclusao mutua distribuida
+│   │   └── ricart_agrawala.go  # Exclusão mútua distribuída
 │   ├── election/
-│   │   └── bully.go            # Eleicao de lider
+│   │   └── bully.go            # Eleição de líder
 │   ├── network/
-│   │   ├── transport.go        # Camada de comunicacao TCP/JSON
+│   │   ├── transport.go        # Camada de comunicação TCP/JSON
 │   │   └── message.go          # Tipos de mensagem
 │   └── config/
-│       └── config.go           # Configuracao via variaveis de ambiente
+│       └── config.go           # Configuração via variáveis de ambiente
 └── README.md
 ```
 
 ## Como Executar
 
-### Pre-requisitos
+### Pré-requisitos
 
 - Docker e Docker Compose instalados
 
 ### Comandos
 
 ```bash
-# Construir e iniciar todos os 5 nos
+# Construir e iniciar todos os 5 nós
 docker-compose up --build
 
-# Em outro terminal, acompanhar logs de um no especifico
+# Em outro terminal, acompanhar logs de um nó específico
 docker logs -f node1
 
-# Simular falha do lider (node5)
+# Simular falha do líder (node5)
 docker stop node5
 
-# Observar nos logs que uma eleicao ocorre e node4 assume como lider
+# Observar nos logs que uma eleição ocorre e node4 assume como líder
 
-# Recuperar o lider original
+# Recuperar o líder original
 docker start node5
 
-# node5 retoma lideranca automaticamente (Bully)
+# node5 retoma liderança automaticamente (Bully)
 
 # Parar tudo
 docker-compose down
 ```
 
-## Cenarios de Demonstracao
+## Cenários de Demonstração
 
-### 1. Relogio de Lamport
-- Observe nos logs os timestamps `[Clock: N]` avancando
-- Quando um no envia uma mensagem, o timestamp e anexado
-- Quando um no recebe uma mensagem, ajusta: `max(local, recebido) + 1`
+### 1. Relógio de Lamport
+- Observe nos logs os timestamps `[Clock: N]` avançando
+- Quando um nó envia uma mensagem, o timestamp é anexado
+- Quando um nó recebe uma mensagem, ajusta: `max(local, recebido) + 1`
 
-### 2. Exclusao Mutua (Ricart-Agrawala)
-- Multiplos nos solicitam a secao critica periodicamente
-- Observe que apenas UM no por vez esta na secao critica
-- Logs `SECAO CRITICA` nunca se sobrepoem entre nos
+### 2. Exclusão Mútua (Ricart-Agrawala)
+- Múltiplos nós solicitam a seção crítica periodicamente
+- Observe que apenas UM nó por vez está na seção crítica
+- Logs `SECAO CRITICA` nunca se sobrepõem entre nós
 
-### 3. Eleicao de Lider (Bully)
-- `docker stop node5` -> eleicao automatica -> node4 vira lider
-- `docker start node5` -> node5 retoma lideranca
-- `docker stop node4 node5` -> node3 vira lider
+### 3. Eleição de Líder (Bully)
+- `docker stop node5` -> eleição automática -> node4 vira líder
+- `docker start node5` -> node5 retoma liderança
+- `docker stop node4 node5` -> node3 vira líder
 
 ## Protocolo de Mensagens
 
-| Tipo          | Algoritmo         | Descricao                            |
+| Tipo          | Algoritmo         | Descrição                            |
 |---------------|-------------------|--------------------------------------|
-| `REQUEST`     | Ricart-Agrawala   | Pedido para entrar na secao critica  |
-| `REPLY`       | Ricart-Agrawala   | Permissao concedida                  |
-| `ELECTION`    | Bully             | Inicio de eleicao                    |
+| `REQUEST`     | Ricart-Agrawala   | Pedido para entrar na seção crítica  |
+| `REPLY`       | Ricart-Agrawala   | Permissão concedida                  |
+| `ELECTION`    | Bully             | Início de eleição                    |
 | `OK`          | Bully             | "Estou vivo e tenho ID maior"        |
-| `COORDINATOR` | Bully             | "Eu sou o novo lider"                |
-| `HEARTBEAT`   | Bully             | Sinal periodico de vida do lider     |
+| `COORDINATOR` | Bully             | "Eu sou o novo líder"                |
+| `HEARTBEAT`   | Bully             | Sinal periódico de vida do líder     |
 
-## Referencias
+## Configuração
 
-1. Lamport, L. "Time, Clocks, and the Ordering of Events in a Distributed System." Communications of the ACM, 1978.
-2. Ricart, G. e Agrawala, A. K. "An Optimal Algorithm for Mutual Exclusion in Computer Networks." Communications of the ACM, 1981.
-3. Garcia-Molina, H. "Elections in a Distributed Computing System." IEEE Transactions on Computers, 1982.
-4. Coulouris, G. et al. Distributed Systems: Concepts and Design. 5th Ed., 2011.
-5. Tanenbaum, A. S., Van Steen, M. Distributed Systems: Principles and Paradigms. 3rd Ed., 2017.
-6. Go Documentation - Effective Go. https://go.dev/doc/effective_go
+O comportamento dos nós pode ser customizado alterando as variáveis de ambiente no arquivo `docker-compose.yml`:
+
+- `NODE_ID`: O identificador numérico único do nó (ex: 1, 2, 3...). O nó com maior ID tem prioridade na eleição (Algoritmo Bully).
+- `TOTAL_NODES`: O número total de nós configurados na rede. Utilizado para estabelecer as conexões iniciais.
+- O DNS interno do Docker resolve automaticamente os hostnames (`node1`, `node2`, etc.) para que os nós se encontrem na mesma rede.
+
+## Observações de Implementação
+
+- **Conexões**: Cada nó atua simultaneamente como servidor e cliente, estabelecendo conexões TCP diretas e persistentes com todos os outros nós.
+- **Tratamento de Falhas**: No algoritmo Bully, se um *heartbeat* não é recebido dentro do tempo limite (*timeout*) ou se a conexão com o líder atual é perdida, uma nova eleição é disparada imediatamente pelo nó que detectou a falha.
+- **Integração de Algoritmos**: O Relógio Lógico de Lamport é utilizado de forma integrada com o algoritmo de Exclusão Mútua de Ricart-Agrawala. Ele garante a ordenação causal dos pedidos `REQUEST`, assegurando que o acesso à seção crítica seja justo (*fairness*).

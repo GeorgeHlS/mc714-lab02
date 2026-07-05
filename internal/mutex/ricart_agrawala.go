@@ -5,6 +5,7 @@ import (
 	"lab2/internal/network"
 	"log"
 	"sync"
+	"time"
 )
 
 type State int
@@ -55,15 +56,31 @@ func (ra *RicartAgrawala) RequestCS() {
 	log.Printf("[Node %d][Clock: %d] MUTEX | Solicitando secao critica (REQUEST broadcast, ts=%d)",
 		ra.nodeID, ts, ts)
 
-	ra.transport.Broadcast(network.Message{
-		Type:      "REQUEST",
-		SenderID:  ra.nodeID,
-		Timestamp: ts,
-	})
+	needed := 0
+	for id := 1; id <= ra.totalNodes; id++ {
+		if id != ra.nodeID {
+			targetID := id
+			err := ra.transport.Send(targetID, network.Message{
+				Type:      "REQUEST",
+				SenderID:  ra.nodeID,
+				Timestamp: ts,
+			})
+			if err == nil {
+				needed++
+			} else {
+				log.Printf("[Node %d][Clock: %d] MUTEX | Falha ao enviar REQUEST para Node %d, assumindo falho",
+					ra.nodeID, ra.clock.Time(), targetID)
+			}
+		}
+	}
 
-	needed := ra.totalNodes - 1
 	for i := 0; i < needed; i++ {
-		<-ra.replyChan
+		select {
+		case <-ra.replyChan:
+		case <-time.After(5 * time.Second):
+			log.Printf("[Node %d][Clock: %d] MUTEX | Timeout aguardando REPLY, prosseguindo",
+				ra.nodeID, ra.clock.Time())
+		}
 	}
 
 	ra.mu.Lock()

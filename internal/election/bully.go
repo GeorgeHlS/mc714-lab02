@@ -24,6 +24,7 @@ type BullyElection struct {
 	electionInProgress bool
 	lastHeartbeat      time.Time
 	okReceived         chan struct{}
+	heartbeatRunning   bool
 }
 
 // cria uma nova instancia do algoritmo Bully
@@ -83,11 +84,11 @@ func (be *BullyElection) StartElection() {
 
 	select {
 	case <-be.okReceived:
-		log.Printf("[Node %d][Clock: %d] ELECTION | Recebeu OK, aguardando COORDINATOR...",
-			be.nodeID, be.clock.Time())
 		be.mu.Lock()
 		be.electionInProgress = false
 		be.mu.Unlock()
+		log.Printf("[Node %d][Clock: %d] ELECTION | Recebeu OK, eleicao em andamento em outro no...",
+			be.nodeID, be.clock.Time())
 	case <-time.After(ElectionTimeout):
 		be.declareVictory()
 	}
@@ -97,6 +98,10 @@ func (be *BullyElection) declareVictory() {
 	be.mu.Lock()
 	be.leaderID = be.nodeID
 	be.electionInProgress = false
+	startH := !be.heartbeatRunning
+	if startH {
+		be.heartbeatRunning = true
+	}
 	be.mu.Unlock()
 
 	ts := be.clock.Tick()
@@ -115,7 +120,9 @@ func (be *BullyElection) declareVictory() {
 			}()
 		}
 	}
-	go be.startHeartbeat()
+	if startH {
+		go be.startHeartbeat()
+	}
 }
 
 // recebe ELECTION de um no com ID menor
@@ -174,6 +181,9 @@ func (be *BullyElection) startHeartbeat() {
 		be.mu.Unlock()
 
 		if !isLeader {
+			be.mu.Lock()
+			be.heartbeatRunning = false
+			be.mu.Unlock()
 			return
 		}
 
