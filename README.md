@@ -94,17 +94,3 @@ docker-compose down
 | `OK`          | Bully             | "Estou vivo e tenho ID maior"        |
 | `COORDINATOR` | Bully             | "Eu sou o novo líder"                |
 | `HEARTBEAT`   | Bully             | Sinal periódico de vida do líder     |
-
-## Configuração
-
-O comportamento dos nós pode ser customizado alterando as variáveis de ambiente no arquivo `docker-compose.yml`:
-
-- `NODE_ID`: O identificador numérico único do nó (ex: 1, 2, 3...). O nó com maior ID tem prioridade na eleição (Algoritmo Bully).
-- `TOTAL_NODES`: O número total de nós configurados na rede. Utilizado para estabelecer as conexões iniciais.
-- O DNS interno do Docker resolve automaticamente os hostnames (`node1`, `node2`, etc.) para que os nós se encontrem na mesma rede.
-
-## Observações de Implementação
-
-- **Conexões**: Cada nó atua simultaneamente como servidor e cliente, estabelecendo conexões TCP diretas e persistentes com todos os outros nós.
-- **Tratamento de Falhas**: No algoritmo Bully, se um *heartbeat* não é recebido dentro do tempo limite (*timeout*) ou se a conexão com o líder atual é perdida, uma nova eleição é disparada imediatamente pelo nó que detectou a falha.
-- **Integração de Algoritmos**: O Relógio Lógico de Lamport é utilizado de forma integrada com o algoritmo de Exclusão Mútua de Ricart-Agrawala. Ele garante a ordenação causal dos pedidos `REQUEST`, assegurando que o acesso à seção crítica seja justo (*fairness*).
