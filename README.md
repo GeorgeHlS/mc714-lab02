@@ -2,6 +2,7 @@
 
 ### Equipe:
 George Henrique de Lima Sá - 231529
+
 Gabriel Jerônimo da Silva - 247112
 
 Implementação de três algoritmos fundamentais de sistemas distribuídos usando Go e Docker:
